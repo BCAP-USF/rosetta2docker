@@ -1,0 +1,36 @@
+services:
+  rosetta:
+    image: rosettacommons/rosetta:serial
+    container_name: rosetta
+    volumes:
+      - ./data:/data
+    working_dir: /data
+    stdin_open: true
+    tty: true
+
+  rosetta-mpi:
+    image: rosettacommons/rosetta:mpi
+    container_name: rosetta-mpi
+    volumes:
+      - ./data:/data
+    working_dir: /data
+    stdin_open: true
+    tty: true
+
+  rosetta-jupyter:
+    image: rosettacommons/rosetta:jupyter
+    container_name: rosetta-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./data:/data
+    working_dir: /data
+
+  rosetta-ml:
+    image: rosettacommons/rosetta:ml
+    container_name: rosetta-ml
+    volumes:
+      - ./data:/data
+    working_dir: /data
+    stdin_open: true
+    tty: true
