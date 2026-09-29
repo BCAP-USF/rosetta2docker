@@ -3,8 +3,9 @@ services:
     image: rosettacommons/rosetta:serial
     container_name: rosetta
     volumes:
-      - ./data:/data
-    working_dir: /data
+      - ./data:/app/data
+      - ./src:/app/src
+    working_dir: /app
     stdin_open: true
     tty: true
 
@@ -12,8 +13,8 @@ services:
     image: rosettacommons/rosetta:mpi
     container_name: rosetta-mpi
     volumes:
-      - ./data:/data
-    working_dir: /data
+      - ./data:/app/data
+    working_dir: /app/data
     stdin_open: true
     tty: true
 
@@ -24,6 +25,7 @@ services:
       - "8888:8888"
     volumes:
       - ./data:/data
+      - ./src:/src
     working_dir: /data
 
   rosetta-ml:

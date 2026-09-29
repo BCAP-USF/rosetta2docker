@@ -1,0 +1,25 @@
+# Estruturas e moléculas: são dados do usuário, não código. O script lê de
+# data/proteins/ e data/ligands/, mas os arquivos ficam na máquina de cada
+# um e não entram no repositório. As pastas são criadas à mão — veja a
+# seção 2 do README.
+data/proteins/
+data/ligands/
+
+# Saídas geradas pelo pipeline — recriadas a cada execução, nunca versionar.
+data/params/
+data/prep/
+data/resultados/
+data/logs/
+data/complexes/
+
+# Cache do Python
+__pycache__/
+*.pyc
+
+# Sistema operacional / editores
+.DS_Store
+.idea/
+.vscode/
+
+# Scripts antigos preservados só localmente
+src/_old/

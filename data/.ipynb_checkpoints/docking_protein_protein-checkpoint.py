@@ -7,7 +7,7 @@ init()
 
 # 2. Carregar e combinar os dois PDBs individuais
 pose_receptor = pose_from_file("RAR.pdb")
-pose_ligante = pose_from_file("ligand.pdb")
+pose_ligante = pose_from_file("Curcumina.sdf")
 
 pose_inicial = Pose()
 pose_inicial.assign(pose_receptor)
