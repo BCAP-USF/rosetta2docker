@@ -36,3 +36,5 @@ services:
     working_dir: /data
     stdin_open: true
     tty: true
+  
+  

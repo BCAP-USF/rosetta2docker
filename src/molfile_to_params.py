@@ -53,6 +53,55 @@ def gerar_pdb(sdf_path, nome="LG1", pdb_path="LIG_0001.pdb", params_path=None):
     return pdb_path
 
 
+def gerar_sdf(pdb_path, sdf_origem, sdf_path):
+    """Gera o .sdf do ligante a partir do PDB gerado por gerar_pdb.
+
+    O PDB não guarda ordens de ligação (nem gerar_pdb escreve CONECT), então
+    o bloco de bonds — e todos os demais campos do molfile — vêm do SDF de
+    origem. Como gerar_pdb escreve os átomos na mesma ordem do SDF, basta
+    substituir as coordenadas de cada linha do bloco de átomos; o resto é
+    copiado sem alteração. Os elementos são conferidos átomo a átomo para
+    falhar alto se as ordens divergirem.
+    """
+    linhas = open(sdf_origem).read().splitlines()
+    n_atoms = int(linhas[3][:3])
+    bloco = linhas[4:4 + n_atoms]
+    if len(bloco) != n_atoms:
+        raise RuntimeError(
+            f"SDF de origem truncado: {n_atoms} átomos declarados mas "
+            f"{len(bloco)} linhas no bloco de átomos.")
+
+    atoms_pdb = [l for l in open(pdb_path) if l.startswith("HETATM")]
+    if len(atoms_pdb) != n_atoms:
+        raise RuntimeError(
+            f"{len(atoms_pdb)} átomos no PDB mas {n_atoms} no SDF de origem — "
+            f"as coordenadas não poderiam ser alinhadas pela ordem.")
+
+    for i, (linha_pdb, linha_sdf) in enumerate(zip(atoms_pdb, bloco), start=1):
+        # Colunas fixas dos dois formatos — nunca split() em linha de PDB.
+        elem_pdb = linha_pdb[76:78].strip().upper()
+        elem_sdf = linha_sdf.split()[3].upper()
+        if elem_pdb != elem_sdf:
+            raise RuntimeError(
+                f"Átomo {i}: elemento {elem_pdb or '?'} no PDB mas {elem_sdf} "
+                f"no SDF de origem — a ordem dos átomos divergiu.")
+
+    with open(sdf_path, "w") as f:
+        # título, programa, comentário e counts do SDF de origem
+        f.writelines(f"{l}\n" for l in linhas[:4])
+        for linha_pdb, linha_sdf in zip(atoms_pdb, bloco):
+            x = float(linha_pdb[30:38])
+            y = float(linha_pdb[38:46])
+            z = float(linha_pdb[46:54])
+            # Substitui só os 3 campos de coordenada (%10.4f); símbolo e
+            # demais campos V2000 da linha original são preservados.
+            f.write(f"{x:10.4f}{y:10.4f}{z:10.4f}{linha_sdf[30:]}\n")
+        # bonds, M  END, propriedades e $$$$ do SDF de origem
+        f.writelines(f"{l}\n" for l in linhas[4 + n_atoms:])
+    print(f"Arquivo {sdf_path} gerado com sucesso!")
+    return sdf_path
+
+
 if __name__ == "__main__":
     import sys
     gerar_params(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else "LG1")
